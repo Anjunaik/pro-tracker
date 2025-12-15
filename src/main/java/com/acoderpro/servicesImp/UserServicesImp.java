@@ -3,6 +3,9 @@
  */
 package com.acoderpro.servicesImp;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -12,6 +15,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.acoderpro.dto.AdminUserReqDTO;
+import com.acoderpro.dto.DefaultUserReqDTO;
+import com.acoderpro.exceptions.ConfirmPasswordMismatchException;
 import com.acoderpro.exceptions.RoleNotFoundException;
 import com.acoderpro.exceptions.UserAlreadyExistsException;
 import com.acoderpro.pojo.UserEntity;
@@ -43,46 +48,70 @@ public class UserServicesImp implements UserService {
 	@Override
 	public void createUserAccount(Object dto, boolean isAdmin) {
 
-		log.info("User creation method called");
-		UserEntity userEntity = modelMapper.map(dto, UserEntity.class);
-		userEntity.setPassword(encode.encode(userEntity.getPassword()));
+	    log.info("User creation method called");
 
-		// Check duplicate email
-		if (repository.findByEmail(userEntity.getEmail()).isPresent()) {
-			throw new UserAlreadyExistsException("User Already Exists");
-		}
+	    // 1️⃣ Validate password & confirm password
+	    String password;
+	    String confirmPassword;
 
-		// CASE 1: Normal User → only default role
-		if (!isAdmin ) {
-			
-			//log.error();
+	    if (dto instanceof DefaultUserReqDTO userDto) {
+	        password = userDto.getPassword();
+	        confirmPassword = userDto.getConfirmPassword();
+	    }
+	    else if (dto instanceof AdminUserReqDTO adminDto) {
+	        password = adminDto.getPassword();
+	        confirmPassword = adminDto.getConfirmPassword();
+	    }
+	    else {
+	        throw new IllegalArgumentException("Invalid DTO type");
+	    }
 
-			UserRoles defaultRole = rolesRepository.findByName("ROLE_USER")
-					.orElseThrow(() -> new RoleNotFoundException("Default USER role not found"));
+	    if (!password.equals(confirmPassword)) {
+	        throw new ConfirmPasswordMismatchException("Password and Confirm Password do not match");
+	    }
 
-			userEntity.setRoles(Set.of(defaultRole));
-		}
+	    // 2️⃣ Map DTO → Entity
+	    UserEntity userEntity = modelMapper.map(dto, UserEntity.class);
 
-		// CASE 2: Admin User → roles come from DTO roleIds (NOT from entity)
-		else {
+	    // 3️⃣ Encode password
+	    userEntity.setPassword(encode.encode(password));
 
-			AdminUserReqDTO adminDto = (AdminUserReqDTO) dto;
+	    // 4️⃣ Check duplicate email
+	    if (repository.findByEmail(userEntity.getEmail()).isPresent()) {
+	        throw new UserAlreadyExistsException("User Already Exists");
+	    }
 
-			if (adminDto.getRoles() == null || adminDto.getRoles().isEmpty()) {
-				throw new RuntimeException("Admin must assign at least one role");
-			}
+	    // 5️⃣ Assign roles
+	    if (!isAdmin) {
+	        // Normal user → default role
+	        UserRoles defaultRole = rolesRepository.findByName("ROLE_USER")
+	                .orElseThrow(() -> new RoleNotFoundException("Default USER role not found"));
 
-			// Load all roles from DB
-			Set<UserRoles> roles = adminDto.getRoles().stream().map(
-					id -> rolesRepository.findById(id).orElseThrow(() -> new RuntimeException("Role not found: " + id)))
-					.collect(Collectors.toSet());
+	        userEntity.setRoles(Set.of(defaultRole));
+	    }
+	    else {
+	        // Admin user → roles from DTO
+	        AdminUserReqDTO adminDto = (AdminUserReqDTO) dto;
 
-			userEntity.setRoles(roles); // final roles list
-		}
+	        if (adminDto.getRoles() == null || adminDto.getRoles().isEmpty()) {
+	            throw new RuntimeException("Admin must assign at least one role");
+	        }
 
-		repository.save(userEntity);
-		log.info("User Created Successfully");
+	        Set<UserRoles> roles = adminDto.getRoles().stream()
+	                .map(id -> rolesRepository.findById(id)
+	                        .orElseThrow(() -> new RuntimeException("Role not found: " + id)))
+	                .collect(Collectors.toSet());
+
+	        userEntity.setRoles(roles);
+	    }
+
+	    // 6️⃣ Audit fields
+	    userEntity.setUserCreated(
+	            Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
+	    userEntity.setUserUpdated(null);
+
+	    repository.save(userEntity);
+	    log.info("User Created Successfully");
 	}
 
-	
 }

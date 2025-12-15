@@ -1,7 +1,5 @@
 package com.acoderpro.authconfiguration;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,50 +20,45 @@ import jakarta.servlet.http.HttpServletResponse;
 @Configuration
 public class SecurityConfig {
 
-    @Autowired
-    private JwtFilter jwtFilter;
+	@Autowired
+	private JwtFilter jwtFilter;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+	@Autowired
+	private UserDetailsService userDetailsService;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/auth/login", "/auth/register",
-                                 "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
-                                 "/api/v1/register/users")
-                .permitAll()
-                .requestMatchers("/api/v1//admin/users").hasRole("ADMIN")
-                .anyRequest().authenticated()
-            ).exceptionHandling(ex -> ex
-            	    .accessDeniedHandler((request, response, accessDeniedException) -> {
-            	        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            	        response.setContentType("application/json");
-            	        response.getWriter().write("{\"error\": \"Forbidden\", \"message\": \"" + accessDeniedException.getMessage() + "\"}");
-            	    })
-            	    .authenticationEntryPoint((request, response, authException) -> {
-            	        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            	        response.setContentType("application/json");
-            	        response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
-            	    })
-            	)
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+	@Bean
+	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+		http.csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/auth/login", "/auth/register", "/v3/api-docs/**", "/swagger-ui/**",
+								"/swagger-ui.html", "/api/v1/register/users")
+						.permitAll().requestMatchers("/api/v1//admin/users").hasRole("ADMIN").anyRequest()
+						.authenticated())
+				.exceptionHandling(ex -> ex.accessDeniedHandler((request, response, accessDeniedException) -> {
+					response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+					response.setContentType("application/json");
+					response.getWriter().write(
+							"{\"error\": \"Forbidden\", \"message\": \"" + accessDeniedException.getMessage() + "\"}");
+				}).authenticationEntryPoint((request, response, authException) -> {
+					response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+					response.setContentType("application/json");
+					response.getWriter().write(
+							"{\"error\": \"Unauthorized\", \"message\": \"" + authException.getMessage() + "\"}");
+				})).sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+				.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+		return http.build();
+	}
 
-    @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-        return authBuilder.build();
-    }
+	@Bean
+	public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+		AuthenticationManagerBuilder authBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
+		authBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+		return authBuilder.build();
+	}
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+	@Bean
+	public PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 }

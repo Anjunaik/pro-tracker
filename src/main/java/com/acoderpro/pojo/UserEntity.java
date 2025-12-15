@@ -1,6 +1,7 @@
 package com.acoderpro.pojo;
 
-import java.sql.Date;
+
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -28,49 +29,47 @@ import lombok.Setter;
 @Table(name = "user_account")
 public class UserEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.UUID)
+	private UUID id;
 
-    @Column(nullable = false)
-    private String firstName;
+	@Column(nullable = false)
+	private String firstName;
 
-    @Column(nullable = false)
-    private String lastName;
+	@Column(nullable = false)
+	private String lastName;
 
-    private String middleName;
+	private String middleName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	@Column(nullable = false, unique = true)
+	private String email;
 
-    @Column(nullable = false)
-    private String password;
+	@Column(nullable = false)
+	private String password;
 
-    private boolean active = true;
-    
-    @Column(nullable = false)
-    private Date userCreated;
-    
-    @Column(nullable = false)
-    private Date userUpdated;
+	private boolean active = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "user_role",
-        joinColumns = @JoinColumn(name = "user_id"),
-        inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<UserRoles> roles = new HashSet<>();
+	@Column(nullable = true)
+	private Date userCreated;
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof UserEntity other)) return false;
-        return id != null && id.equals(other.getId());
-    }
+	@Column(nullable = true)
+	private Date userUpdated;
 
-    @Override
-    public int hashCode() {
-        return 31;
-    }
+	@ManyToMany(fetch = FetchType.EAGER)
+	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+	private Set<UserRoles> roles = new HashSet<>();
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof UserEntity other))
+			return false;
+		return id != null && id.equals(other.getId());
+	}
+
+	@Override
+	public int hashCode() {
+		return 31;
+	}
 }

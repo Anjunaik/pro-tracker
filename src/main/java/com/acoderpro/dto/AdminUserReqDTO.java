@@ -1,10 +1,12 @@
 package com.acoderpro.dto;
 
-import java.sql.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.Column;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,28 +18,24 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AdminUserReqDTO {
 
-	@Column(nullable = false)
-    private String firstName;
+	@Size(max = 50, min = 3, message = "Frist name must be between 3 and 50 characters")
+	private String firstName;
 
-    @Column(nullable = false)
-    private String lastName;
+	@Size(max = 50, min = 3, message = "Last name must be between 3 and 50 characters")
+	private String lastName;
 
-    private String middleName;
+	private String middleName;
 
-    @Column(nullable = false, unique = true)
-    private String email;
+	@NotBlank(message = "Email cannot be empty")
+	@Email(message = "Invalid email format")
+	@Size(max = 50, min = 7, message = "Mail must be between 7 and 50 characters")
+	private String email;
 
-    @Column(nullable = false)
-    private String password;
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$", message = "Password must be 8-20 characters and include upper, lower, number, and special character")
+	private String password;
+	
+	@Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,20}$", message = "Password must be 8-20 characters and include upper, lower, number, and special character")
+	private String confirmPassword;
 
-    private boolean active = true;
-    
-    @Column(nullable = false)
-    private Date userCreated;
-    
-    @Column(nullable = false)
-    private Date userUpdated;
-    
-    @Column(nullable= false)
-    private Set<Integer> roles = new HashSet<Integer>();
+	private Set<Integer> roles = new HashSet<Integer>();
 }
