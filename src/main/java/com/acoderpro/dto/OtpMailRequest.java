@@ -9,8 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class OtpMailRequest {
 
-	private String email;
-	private String otp;
-	private String purpose;
-
+	private String to;
+	private String subject;
+	private String body;
 }

@@ -1,4 +1,4 @@
-package com.acoderpro.authservices;
+package com.acoderpro.utilities;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;

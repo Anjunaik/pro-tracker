@@ -1,10 +1,15 @@
 package com.acoderpro.pojo;
 
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
+
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,6 +32,14 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "user_account")
+@FilterDef(
+	    name = "activeUserFilter",
+	    parameters = @ParamDef(name = "isActive", type = Boolean.class)
+	)
+	@Filter(
+	    name = "activeUserFilter",
+	    condition = "active = :isActive"
+	)
 public class UserEntity {
 
 	@Id
@@ -56,6 +69,7 @@ public class UserEntity {
 	private Date userUpdated;
 
 	@ManyToMany(fetch = FetchType.EAGER)
+	@JsonIgnore
 	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<UserRoles> roles = new HashSet<>();
 

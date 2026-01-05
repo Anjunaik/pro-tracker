@@ -1,21 +1,17 @@
 package com.acoderpro.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ResetPasswordDTO {
-
-	@Email
-	private String email;
-
-	@NotBlank
+@Setter
+@Getter
+public class ChangePasswordDTO {
+	
+	private String oldPassword;
 	private String newPassword;
+
 }
