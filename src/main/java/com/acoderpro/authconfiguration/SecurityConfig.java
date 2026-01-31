@@ -40,8 +40,9 @@ public class SecurityConfig {
             //.and()
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(SecurityConstants.PUBLIC_URLS).permitAll()
-                .requestMatchers("/api/v1/change-password").hasRole("USER")
+                .requestMatchers("/api/v1/change-password").hasAnyRole("USER","ADMIN")
                 .requestMatchers("/api/v1/admin-create-user").hasRole("ADMIN")
+                .requestMatchers("/api/v1//users-delete").hasRole("ADMIN")
                 .requestMatchers("/api/v1/account/user/**").hasRole("ADMIN")
                 .requestMatchers("/api/v1/account/greet/**").hasRole("ADMIN")
                 .anyRequest().authenticated()

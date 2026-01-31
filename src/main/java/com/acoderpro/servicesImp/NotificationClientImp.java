@@ -1,7 +1,5 @@
 package com.acoderpro.servicesImp;
 
-import java.time.Duration;
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -43,7 +41,6 @@ public class NotificationClientImp implements NotificationClient {
 	                                ))
 	                )
 	                .bodyToMono(String.class)
-	                .timeout(Duration.ofSeconds(10))
 	                .block(); // 🔥 IMPORTANT
 
 	    } catch (Exception ex) {

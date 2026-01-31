@@ -249,6 +249,95 @@ public class EmailTemplates {
 	        """.formatted(HtmlUtils.htmlEscape(name));
 	}
 	
+	public static String registrationSuccessTemplate(String name) {
+	    return """
+	        <!DOCTYPE html>
+	        <html lang="en">
+	        <head>
+	            <meta charset="UTF-8">
+	            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	            <title>Registration Successful</title>
+	        </head>
+
+	        <body style="margin:0; padding:0; background-color:#f4f6f8; font-family:Arial, Helvetica, sans-serif;">
+
+	        <table width="100%%" cellpadding="0" cellspacing="0" role="presentation">
+	            <tr>
+	                <td align="center" style="padding:20px;">
+
+	                    <table width="600" cellpadding="0" cellspacing="0" role="presentation"
+	                           style="background-color:#ffffff; border-radius:6px; overflow:hidden;
+	                                  box-shadow:0 4px 12px rgba(0,0,0,0.08);">
+
+	                        <!-- Header -->
+	                        <tr>
+	                            <td style="background-color:#2563eb; padding:18px 24px;">
+	                                <h2 style="margin:0; color:#ffffff; font-size:20px;">
+	                                    Welcome to ProTrack 🎉
+	                                </h2>
+	                            </td>
+	                        </tr>
+
+	                        <!-- Content -->
+	                        <tr>
+	                            <td style="padding:24px; color:#333333; font-size:14px; line-height:1.6;">
+
+	                                <p style="margin-top:0;">
+	                                    Hello <strong>%s</strong>,
+	                                </p>
+
+	                                <p>
+	                                    Your registration with <strong>ProTrack</strong> was successful!
+	                                </p>
+
+	                                <p>
+	                                    You can now log in and start managing your projects securely
+	                                    and efficiently using our platform.
+	                                </p>
+
+	                                <p style="margin-top:16px;">
+	                                    🔐 <strong>Security Tip:</strong>  
+	                                    Keep your login credentials safe and never share your password with anyone.
+	                                </p>
+
+	                                <p style="margin-top:20px;">
+	                                    If you have any questions or need assistance, feel free to reach out to our
+	                                    support team.
+	                                </p>
+
+	                                <p style="margin-top:16px;">
+	                                    📧 <strong>Support Email:</strong>
+	                                    <a href="mailto:support@acoder.com">support@acoder.com</a>
+	                                </p>
+
+	                            </td>
+	                        </tr>
+
+	                        <!-- Footer -->
+	                        <tr>
+	                            <td style="background-color:#f4f6f8; padding:16px;
+	                                       text-align:center; font-size:12px; color:#666666;">
+	                                <p style="margin:0;">
+	                                    Thank you for choosing ProTrack.
+	                                </p>
+	                                <p style="margin:8px 0 0;">
+	                                    © 2026 ProTrack. All rights reserved.
+	                                </p>
+	                            </td>
+	                        </tr>
+
+	                    </table>
+
+	                </td>
+	            </tr>
+	        </table>
+
+	        </body>
+	        </html>
+	        """.formatted(HtmlUtils.htmlEscape(name));
+	}
+
+	
 	public static OtpMailRequest createMailContent(String subject, String toMail, String htmlTemplate) {
 
 		OtpMailRequest request = new OtpMailRequest();

@@ -1,6 +1,7 @@
 package com.acoderpro.controller;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -55,8 +56,9 @@ public class UserAccount {
 	public ResponseEntity<?> createAccount(@RequestBody DefaultUserReqDTO defaultUserReqDTO) {
 
 		UserEntity userAccount = userService.createUserAccount(defaultUserReqDTO, false);
-		return ResponseEntity.created(URI.create("/api/v1/account/users/" + userAccount.getId())).body(
-				Map.of("message", "User created successfully", "userId", ""+userAccount.getId()));
+
+		return ResponseEntity.created(URI.create("/api/v1/account/users/" + userAccount.getId()))
+				.body(Map.of("message", "User created successfully", "userId", "" + userAccount.getId()));
 
 	}
 
@@ -94,27 +96,27 @@ public class UserAccount {
 		return ResponseEntity.ok(passwordServices.changePassword(changePassword));
 	}
 
-
-    @GetMapping("/user/{id}")
-    @Operation(
-        summary = "Get user by ID",
-        description = "Provide a UUID to fetch a specific user"
-    )
-    public ResponseEntity<?> getUser(
-            @Parameter(
-                description = "UUID of the user to fetch",
-                example = "550e8400-e29b-41d4-a716-446655440000"
-            )
-            @PathVariable("id") UUID id // <-- Explicitly specify name here
-    ) {
-        return ResponseEntity.ok(userService.findUserByID(id));
-    }
-
-	
-	@GetMapping("/greet")
-	public ResponseEntity<?> welcome()
-	{
-		 return ResponseEntity.ok("Welcome");
+	@GetMapping("/user/{id}")
+	@Operation(summary = "Get user by ID", description = "Provide a UUID to fetch a specific user")
+	public ResponseEntity<?> getUser(
+			@Parameter(description = "UUID of the user to fetch", example = "550e8400-e29b-41d4-a716-446655440000") @PathVariable("id") UUID id // <--
+																																				// Explicitly
+																																				// specify
+																																				// name
+																																				// here
+	) {
+		return ResponseEntity.ok(userService.findUserByID(id));
 	}
-	
+
+	@PostMapping(value="/users-delete",consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> deleteUserByAdmin(@RequestBody List<UUID> ids) {
+
+		return ResponseEntity.ok(userService.deleteUserById(ids));
+	}
+
+	@GetMapping("/greet")
+	public ResponseEntity<?> welcome() {
+		return ResponseEntity.ok("Welcome");
+	}
+
 }

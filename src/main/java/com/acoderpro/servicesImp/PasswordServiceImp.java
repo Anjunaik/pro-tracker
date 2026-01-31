@@ -46,11 +46,11 @@ public class PasswordServiceImp implements PasswordServices {
 	@Autowired
 	private JWTUtil getUsername;
 
-	private final NotificationClientImp clientImp;
+	private final NotificationClientImp notification;
 
-	public PasswordServiceImp(UserRepository userRepo, NotificationClientImp clientImp) {
+	public PasswordServiceImp(UserRepository userRepo, NotificationClientImp notification) {
 		this.userRepo = userRepo;
-		this.clientImp = clientImp;
+		this.notification = notification;
 	}
 
 	@Override
@@ -60,7 +60,7 @@ public class PasswordServiceImp implements PasswordServices {
 		UserEntity user = userRepo.findByEmail(dto.getEmail())
 				.orElseThrow(() -> new UsernameNotFoundException("No user found with this email"));
 		if (!user.isActive()) {
-			clientImp.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset OTP", user.getEmail(),
+			notification.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset OTP", user.getEmail(),
 					EmailTemplates.accountInactiveTemplate(user.getFirstName())));
 			throw new AccountInactiveException("Your account is inactive.Please check mail and contact support.");
 		}
@@ -80,7 +80,7 @@ public class PasswordServiceImp implements PasswordServices {
 
 		// 4️⃣ Send OTP mail (FAILS request if notification is down)
 
-		clientImp.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset OTP", user.getEmail(),
+		notification.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset OTP", user.getEmail(),
 				EmailTemplates.otpTemplate(otp)));
 
 		return "OTP sent successfully";
@@ -127,7 +127,7 @@ public class PasswordServiceImp implements PasswordServices {
 		userRepo.save(userEntity);
 		reset.delete(passwordToken);
 
-		clientImp.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset Success", userEntity.getEmail(),
+		notification.sendOtp(EmailTemplates.createMailContent("ProTrack - Password Reset Success", userEntity.getEmail(),
 				EmailTemplates.passwordUpdateTemplate(userEntity.getFirstName())));
 		return "Password Updated successfully";
 	}

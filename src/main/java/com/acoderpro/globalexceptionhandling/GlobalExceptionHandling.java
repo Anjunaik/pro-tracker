@@ -7,6 +7,7 @@ import java.util.Map;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -96,7 +97,7 @@ public class GlobalExceptionHandling {
 		error.put("status", HttpStatus.FORBIDDEN);
 		error.put("error", "YOUR ACCOUNT IS INACTIVE");
 		error.put("message", ex.getMessage());
-		
+
 		return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
 	}
 
@@ -109,6 +110,23 @@ public class GlobalExceptionHandling {
 		error.put("error", "SERVICE UNAVAILABLE");
 		error.put("message", ex.getMessage());
 		return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+	}
+
+	@ExceptionHandler(DisabledException.class)
+	public ResponseEntity<?> handleDisabledUser(DisabledException ex) {
+//	    return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//	            .body(new ApiError(
+//	                    "FORBIDDEN",
+//	                    "Your account has been deactivated. Please contact administrator."
+//	            ));
+
+		Map<String, Object> error = new HashMap<>();
+		error.put("timestamp", LocalDateTime.now());
+		error.put("status", HttpStatus.FORBIDDEN.value());
+		error.put("error", "FORBIDDEN");
+		error.put("message", "Your account has been deactivated. Please contact administrator.");
+
+		return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
 	}
 
 }
